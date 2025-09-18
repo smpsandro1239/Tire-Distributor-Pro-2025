@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Navigation } from './components/Navigation'
 import './globals.css'
 import { Providers } from './providers'
 
@@ -23,7 +24,12 @@ export default function RootLayout({
     <html lang="pt" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          {children}
+          <div className="min-h-screen bg-gray-50">
+            <Navigation />
+            <main className="pt-16">
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>
