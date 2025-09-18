@@ -1,0 +1,481 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TenantType {
+  DISTRIBUTOR
+  RESELLER
+  FLEET
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RetreadGrade {
+  A
+  B
+  C
+  REJECTED
+}
+
+enum VehicleType {
+  CAR
+  TRUCK
+  MOTORCYCLE
+  BUS
+  AGRICULTURAL
+  INDUSTRIAL
+}
+
+model Tenant {
+  id            String     @id @default(uuid())
+  slug          String     @unique
+  name          String
+  type          TenantType @default(RESELLER)
+  parentId      String?
+  parent        Tenant?    @relation("TenantHierarchy", fields: [parentId], references: [id])
+  children      Tenant[]   @relation("TenantHierarchy")
+
+  // Stripe Connect
+  stripeAcctId  String?    @unique
+  margin        Decimal    @default(0.18)
+
+  // Settings
+  isActive      Boolean    @default(true)
+  domain        String?    @unique
+  logo          String?
+  primaryColor  String     @default("#3B82F6")
+
+  // Contact
+  email         String
+  phone         String?
+  address       String?
+  city          String?
+  country       String     @default("PT")
+
+  // Metadata
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  users         User[]
+  tires         Tire[]
+  orders        Order[]
+  inventory     Inventory[]
+  fleets        Fleet[]
+
+  @@map("tenants")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  avatar        String?
+  role          String    @default("USER")
+
+  // Multi-tenant
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Auth
+  emailVerified DateTime?
+  twoFactorEnabled Boolean @default(false)
+
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  orders        Order[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Brand {
+  id          String @id @default(uuid())
+  name        String @unique
+  slug        String @unique
+  logo        String?
+  website     String?
+  country     String?
+
+  // Relations
+  tires       Tire[]
+
+  @@map("brands")
+}
+
+model TireCategory {
+  id          String @id @default(uuid())
+  name        String
+  slug        String @unique
+  description String?
+
+  // Relations
+  tires       Tire[]
+
+  @@map("tire_categories")
+}
+
+model Tire {
+  id                String        @id @default(uuid())
+  sku               String        @unique
+  name              String
+  description       String?
+
+  // Tenant isolation
+  parentTenantId    String        // distributor
+  tenantId          String        // child or parent
+  tenant            Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Product details
+  brandId           String
+  brand             Brand         @relation(fields: [brandId], references: [id])
+  categoryId        String
+  category          TireCategory  @relation(fields: [categoryId], references: [id])
+
+  // Specifications
+  width             Int           // 205
+  aspectRatio       Int           // 55
+  rimDiameter       Int           // 16
+  loadIndex         String?       // 91
+  speedRating       String?       // H
+  vehicleType       VehicleType   @default(CAR)
+  season            String        @default("ALL_SEASON") // SUMMER, WINTER, ALL_SEASON
+
+  // Pricing
+  basePrice         Decimal
+  margin            Decimal       @default(0.18)
+  finalPrice        Decimal?      // calculated
+
+  // Inventory
+  stockQty          Int           @default(0)
+  minStock          Int           @default(5)
+  maxStock          Int           @default(100)
+
+  // Visibility
+  visible           Boolean       @default(true)
+  featured          Boolean       @default(false)
+
+  // Sustainability
+  ecoScore          Float?        // 0-1
+  carbonFootprint   Float?        // kg CO2
+  recyclable        Boolean       @default(true)
+
+  // Retreading
+  casingId          String?       @unique
+  retreadable       Boolean       @default(true)
+  maxRetreads       Int           @default(3)
+
+  // Recall
+  recallId          String?
+  recallActive      Boolean       @default(false)
+
+  // Warranty
+  warrantyMonths    Int           @default(24)
+  warrantyNFT       String?       // blockchain hash
+
+  // Images
+  images            String[]      @default([])
+
+  // Metadata
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  inventory         Inventory[]
+  orderItems        OrderItem[]
+  retreads          Retread[]
+  sensors           TireSensor[]
+
+  @@index([parentTenantId, tenantId])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([sku])
+  @@map("tires")
+}
+
+model Inventory {
+  id          String   @id @default(uuid())
+
+  // Multi-tenant
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Product
+  tireId      String
+  tire        Tire     @relation(fields: [tireId], references: [id], onDelete: Cascade)
+
+  // Stock
+  quantity    Int      @default(0)
+  reserved    Int      @default(0)
+  available   Int      @default(0) // quantity - reserved
+
+  // Location
+  warehouse   String?
+  location    String?  // shelf/bin
+
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, tireId])
+  @@map("inventory")
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Customer
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id])
+  customerEmail   String
+  customerName    String
+  customerPhone   String?
+
+  // Status
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+
+  // Pricing
+  subtotal        Decimal
+  tax             Decimal       @default(0)
+  shipping        Decimal       @default(0)
+  discount        Decimal       @default(0)
+  total           Decimal
+
+  // Payment
+  stripePaymentId String?
+  paymentMethod   String?
+
+  // Shipping
+  shippingAddress Json?
+  billingAddress  Json?
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+
+  // Metadata
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+
+  // Order
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Product
+  tireId      String
+  tire        Tire    @relation(fields: [tireId], references: [id])
+
+  // Details
+  quantity    Int
+  unitPrice   Decimal
+  totalPrice  Decimal
+
+  @@map("order_items")
+}
+
+model Fleet {
+  id          String    @id @default(uuid())
+  name        String
+
+  // Multi-tenant
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Details
+  type        String    // LOGISTICS, EMERGENCY, CONSTRUCTION
+  vehicleCount Int      @default(0)
+
+  // Contact
+  managerName String?
+  managerEmail String?
+  managerPhone String?
+
+  // Contract
+  contractType String?  // KM_BASED, TIME_BASED, PERFORMANCE
+  contractStart DateTime?
+  contractEnd   DateTime?
+
+  // Metadata
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  vehicles    Vehicle[]
+
+  @@map("fleets")
+}
+
+model Vehicle {
+  id            String   @id @default(uuid())
+
+  // Fleet
+  fleetId       String
+  fleet         Fleet    @relation(fields: [fleetId], references: [id], onDelete: Cascade)
+
+  // Vehicle details
+  make          String
+  model         String
+  year          Int
+  vin           String?  @unique
+  licensePlate  String   @unique
+  type          VehicleType
+
+  // Tire configuration
+  frontTireSize String?  // 205/55R16
+  rearTireSize  String?
+  tireCount     Int      @default(4)
+
+  // Mileage
+  currentKm     Int      @default(0)
+  lastServiceKm Int      @default(0)
+
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  sensors       TireSensor[]
+
+  @@map("vehicles")
+}
+
+model TireSensor {
+  id          String   @id @default(uuid())
+  sensorId    String   @unique // physical sensor ID
+
+  // Vehicle
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  // Tire
+  tireId      String?
+  tire        Tire?    @relation(fields: [tireId], references: [id])
+
+  // Position
+  position    String   // FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT
+
+  // Current readings
+  pressure    Float?   // bar
+  temperature Float?   // celsius
+  batteryLevel Float?  // percentage
+
+  // Status
+  isActive    Boolean  @default(true)
+  lastReading DateTime?
+
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tire_sensors")
+}
+
+model Retread {
+  id          String      @id @default(uuid())
+
+  // Tire casing
+  tireId      String
+  tire        Tire        @relation(fields: [tireId], references: [id])
+  casingId    String      // QR/RFID identifier
+
+  // Retread details
+  cycleNumber Int         // 1st, 2nd, 3rd retread
+  grade       RetreadGrade
+
+  // Process
+  processedAt DateTime?
+  processedBy String?     // retread facility
+
+  // Quality
+  qualityScore Float?     // 0-1
+  expectedKm   Int?       // estimated remaining life
+
+  // Metadata
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([casingId, cycleNumber])
+  @@map("retreads")
+}
+
+model PriceHistory {
+  id          String   @id @default(uuid())
+
+  // Tire
+  tireId      String
+
+  // Price data
+  oldPrice    Decimal
+  newPrice    Decimal
+  reason      String?  // AI_OPTIMIZATION, MANUAL, COMPETITOR
+
+  // Metadata
+  createdAt   DateTime @default(now())
+
+  @@map("price_history")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+
+  // User
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  // Action
+  action      String   // CREATE, UPDATE, DELETE
+  resource    String   // TIRE, ORDER, USER
+  resourceId  String
+
+  // Details
+  oldValues   Json?
+  newValues   Json?
+  ipAddress   String?
+  userAgent   String?
+
+  // Metadata
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
