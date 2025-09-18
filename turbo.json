@@ -6,18 +6,33 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
-    "lint": {},
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "test": {},
-    "test:coverage": {
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
-    "db:push": {},
-    "db:migrate": {},
-    "type-check": {},
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     }
