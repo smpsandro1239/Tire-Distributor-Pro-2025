@@ -1,119 +1,231 @@
-# tire-distributor-pro-2025 🚗
+# 🚗 Tire Distribution Platform - B2B/B2C Complete Solution
 
-> "From zero to tire empire in 1 deployment – multi-tenant B2B+B2C, AI-powered, global-scale"
+## 🎯 Overview
 
-Uma plataforma completa de distribuição de pneus B2B com criação automática de sites B2C personalizados para revendedores.
+A comprehensive **multi-tenant B2B tire distribution platform** with **B2C reseller sites**, featuring IoT integration, AI-powered recommendations, and complete e-commerce functionality.
 
-## ✅ Estado Atual do Desenvolvimento
+## ✨ Key Features
 
-### 🎉 Recém Implementado
-- ✅ **Sistema Multi-Tenant Completo** - Middleware de roteamento por subdomínio
-- ✅ **Sites B2C Dinâmicos** - Páginas automáticas para revendedores
-- ✅ **Personalização Total** - Logo, cores, marca, SEO customizáveis
-- ✅ **Schema Expandido** - Promoções, reviews, loyalty, warehouses
-- ✅ **Reseller Router** - CRUD completo com analytics
-- ✅ **Tire Catalog B2C** - Catálogo público com preços dinâmicos
-- ✅ **Admin Dashboard** - Criação e gestão de revendedores
-- ✅ **Componentes UI** - Header, Footer, TireCard personalizáveis
+### 🏢 B2B Admin Platform
+- **Complete Dashboard** with real-time analytics and KPIs
+- **Inventory Management** with full CRUD operations
+- **Order Processing** with status tracking and management
+- **Reseller Management** with multi-tenant isolation
+- **Analytics & Reporting** with comprehensive metrics
+- **Fleet Management** for commercial customers
 
-### Concluído Anteriormente
-- ✅ Estrutura base do monorepo (Turborepo + pnpm workspaces)
-- ✅ Schema Prisma completo com 20+ tabelas multi-tenant
-- ✅ Routers tRPC implementados (Tire, Fleet, Sensor, Retread, Tenant, Reseller)
-- ✅ Packages base criados (auth, stripe, ai, ui, kafka)
-- ✅ Configuração TypeScript e dependências
+### 🛒 B2C E-commerce Sites
+- **Multi-tenant Architecture** - Each reseller gets their own customizable site
+- **Dynamic Subdomains** - Automatic subdomain routing (reseller1.domain.com)
+- **Complete Shopping Cart** with persistent state management
+- **Stripe Integration** for secure payment processing
+- **Product Catalog** with advanced filtering and search
+- **Responsive Design** optimized for all devices
 
-### 🚧 Em Desenvolvimento
-- 🔄 Sistema de carrinho e checkout (Stripe)
-- 🔄 Dashboard de analytics para revendedores
-- 🔄 Sistema de reviews e avaliações
-- 🔄 Programa de fidelidade
+### 🌟 Advanced Features
+- **Review System** - Customer reviews with moderation
+- **Chat Support** - Real-time customer support chat
+- **Loyalty Program** - Points system with Bronze/Silver/Gold tiers
+- **Notification System** - Real-time notifications
+- **SEO Optimization** - Customizable meta tags and descriptions
+- **Analytics Dashboard** - Comprehensive business metrics
 
-### ⏳ Roadmap Próximo
-- ⏳ Integração Stripe Connect para payouts
-- ⏳ Sistema de notificações real-time
-- ⏳ Mobile app (React Native Expo)
-- ⏳ Testes automatizados (>95% coverage)
-- ⏳ CI/CD pipeline completo
+### 🔧 Technical Excellence
+- **Next.js 14** with App Router
+- **TypeScript** for type safety
+- **Prisma ORM** with PostgreSQL
+- **Tailwind CSS** for styling
+- **Turbo Monorepo** for scalable architecture
+- **Multi-tenant Data Isolation**
+- **RESTful APIs** with proper error handling
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- Stripe account (for payments)
+
+### Installation
+
 ```bash
-git clone https://github.com/YOU/tire-distributor-pro-2025.git && cd tire-distributor-pro-2025
-cp .env.example .env            # adicionar STRIPE_SECRET, SUPABASE_SERVICE_ROLE, KAFKA_URI
-npm i -g pnpm@9 vercel@latest
-pnpm i
-pnpm db:push                    # Prisma + Supabase migrations
-pnpm kafka:up                   # docker-compose -f infra/kafka.yml up -d
-pnpm dev                        # localhost:3000 (parent) | rev1.localhost:3000 (child)
-vercel --prod                   # auto-wildcard *.tiredist.com + SSL
+# Clone the repository
+git clone https://github.com/smpsandro1239/Tire-Distributor-Pro-2025.git
+cd Tire-Distributor-Pro-2025
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your database and Stripe credentials
+
+# Setup database
+npx prisma generate
+npx prisma db push
+
+# Start development server
+npm run dev
 ```
 
-## 🚀 Funcionalidades Principais
+### Environment Variables
 
-### Core Business
-- **Multi-tenancy**: Arquitectura pai-filho com isolamento completo
-- **Sincronização em tempo real**: Stock sync via Kafka/WebSocket
-- **Pricing dinâmico**: AI-powered com análise de concorrência
-- **Gestão de margens**: Global, categoria ou SKU específico
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/tire_platform"
 
-### Módulos Avançados
-- **FleetHub**: Gestão de frotas com contratos km/tempo
-- **RetreadCloud**: Rastreamento de recapagens com QR/RFID
-- **SensorLink**: Dados TPMS em tempo real (pressão/temperatura)
-- **TireFinance**: Split-payments e leasing B2B
-- **RecallGuard**: Monitorização de recalls ETRTO/DOT
-- **EcoScore**: Pegada de carbono por pneu
-- **WarrantyWallet**: Garantias blockchain (NFT)
-- **PriceBrain**: AI dynamic pricing
-- **VoiceOrder**: Encomendas por voz (WhatsApp/Alexa)
+# Stripe
+STRIPE_SECRET_KEY="sk_test_..."
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
 
-## 🛠 Stack Tecnológica
+# App
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+```
 
-- **Frontend**: Next.js 15 (App Router), React 18, Tailwind CSS 4
-- **Backend**: tRPC v11, Prisma 6, PostgreSQL 16
-- **Real-time**: Supabase Realtime, Kafka 3.8
-- **Pagamentos**: Stripe Connect 2
-- **AI**: OpenAI GPT-4, Vercel AI SDK 4
-- **Mobile**: React Native Expo 51
-- **Infraestrutura**: Docker, Vercel Edge, GitHub Actions
+## 📁 Project Structure
 
-## 📊 Routers tRPC Implementados
+```
+├── apps/
+│   └── web/                    # Main Next.js application
+│       ├── app/
+│       │   ├── (dashboard)/    # B2B admin dashboard
+│       │   ├── api/           # API routes
+│       │   ├── components/    # Shared components
+│       │   └── reseller/      # B2C reseller sites
+├── packages/
+│   ├── db/                    # Prisma database package
+│   ├── ui/                    # Shared UI components
+│   ├── auth/                  # Authentication package
+│   ├── stripe/                # Stripe integration
+│   └── ai/                    # AI recommendations
+```
 
-### 🔧 Sensor Router
-- `list` - Listar sensores com filtros
-- `getById` - Obter sensor específico
-- `create` - Criar novo sensor
-- `updateReadings` - Actualizar leituras IoT
-- `assignTire` - Associar pneu a sensor
-- `getAlerts` - Alertas de pressão/temperatura/bateria
-- `getAnalytics` - Analytics dos sensores
+## 🎨 Customization
 
-### 🚛 Fleet Router
-- `create` - Criar frota
-- `list` - Listar frotas
-- `getById` - Detalhes da frota
-- `addVehicle` - Adicionar veículo
-- `getAnalytics` - Analytics da frota
-- `scheduleTireChange` - Agendar mudança de pneus
+### Reseller Branding
+Each reseller can customize:
+- **Colors** - Primary, secondary, and accent colors
+- **Branding** - Logo, favicon, brand name
+- **Content** - Tagline, meta descriptions
+- **Features** - Enable/disable reviews, chat, loyalty program
 
-### ♻️ Retread Router
-- `create` - Criar registo de recapagem
-- `list` - Listar recapagens
-- `getCasingHistory` - Histórico do casco
-- `generateQRCode` - Gerar QR code
-- `scanQRCode` - Scan QR code
-- `getAnalytics` - Analytics de recapagens
+### Multi-tenant Architecture
+- **Data Isolation** - Complete separation of reseller data
+- **Custom Domains** - Support for custom domains
+- **Subdomain Routing** - Automatic subdomain detection
+- **Theme Customization** - Per-reseller styling
 
-## 🔄 Próximos Passos
+## 📊 Analytics & Reporting
 
-1. **Resolver erros TypeScript** - Corrigir tipos implícitos
-2. **Criar páginas web** - Interface de utilizador
-3. **Implementar autenticação** - Middleware e RLS
-4. **Configurar Stripe** - Connect accounts
-5. **Testes** - Cobertura >95%
-6. **Deploy** - Vercel + wildcard domains
+### B2B Dashboard
+- Revenue tracking and trends
+- Order management and status
+- Inventory levels and alerts
+- Reseller performance metrics
+- Top-selling products analysis
 
-## 📝 Licença
+### B2C Analytics
+- Sales performance by reseller
+- Customer behavior tracking
+- Product popularity metrics
+- Conversion rate optimization
 
-MIT - Veja o arquivo LICENSE para detalhes.
+## 🛡️ Security Features
+
+- **Multi-tenant Data Isolation**
+- **Role-based Access Control**
+- **Secure Payment Processing**
+- **Input Validation & Sanitization**
+- **HTTPS Enforcement**
+- **Environment Variable Protection**
+
+## 🔌 API Documentation
+
+### Core Endpoints
+
+```
+# Tires
+GET    /api/tires              # List tires with filters
+POST   /api/tires              # Create new tire
+GET    /api/tires/:id          # Get tire details
+PUT    /api/tires/:id          # Update tire
+DELETE /api/tires/:id          # Delete tire
+
+# Orders
+GET    /api/orders             # List orders
+POST   /api/orders             # Create order
+GET    /api/orders/:id         # Get order details
+PUT    /api/orders/:id         # Update order status
+
+# Resellers
+GET    /api/resellers/:subdomain/dashboard  # Reseller analytics
+PUT    /api/resellers/:subdomain/settings   # Update settings
+
+# Reviews
+GET    /api/reviews            # Get product reviews
+POST   /api/reviews            # Submit review
+
+# Loyalty
+GET    /api/loyalty/:tenantId/customer      # Get customer data
+POST   /api/loyalty/:tenantId/join          # Join program
+```
+
+## 🎯 Business Model
+
+### Revenue Streams
+1. **Subscription Fees** - Monthly/yearly reseller subscriptions
+2. **Transaction Fees** - Commission on each sale
+3. **Premium Features** - Advanced analytics, custom domains
+4. **Setup Fees** - Initial onboarding and customization
+
+### Target Market
+- **Tire Distributors** - Wholesale tire companies
+- **Independent Tire Shops** - Local tire retailers
+- **Fleet Operators** - Commercial vehicle fleets
+- **Automotive Service Centers** - Multi-service shops
+
+## 📈 Scalability
+
+### Performance Optimizations
+- **Database Indexing** for fast queries
+- **Image Optimization** with Next.js Image component
+- **Caching Strategies** for frequently accessed data
+- **CDN Integration** for static assets
+
+### Infrastructure
+- **Horizontal Scaling** with load balancers
+- **Database Sharding** for large datasets
+- **Microservices Architecture** with packages
+- **Container Support** with Docker
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- 📧 Email: support@tiredistributor.pro
+- 💬 Discord: [Join our community](https://discord.gg/tiredistributor)
+- 📖 Documentation: [docs.tiredistributor.pro](https://docs.tiredistributor.pro)
+
+## 🎉 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- Database powered by [Prisma](https://prisma.io/)
+- Payments by [Stripe](https://stripe.com/)
+- UI components with [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+**Made with ❤️ for the tire industry**
+
+*Transform your tire business with our complete B2B/B2C platform solution.*
