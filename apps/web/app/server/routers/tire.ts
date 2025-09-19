@@ -3,6 +3,111 @@ import { z } from 'zod'
 import { publicProcedure, router, tenantProcedure } from '../trpc'
 
 export const tireRouter = router({
+  // Get reseller catalog (public)
+  getResellerCatalog: publicProcedure
+    .input(z.object({
+      resellerTenantId: z.string(),
+      page: z.number().default(1),
+      limit: z.number().default(20),
+      search: z.string().optional(),
+      brandId: z.string().optional(),
+      categoryId: z.string().optional(),
+      vehicleType: z.enum(['CAR', 'TRUCK', 'MOTORCYCLE', 'BUS', 'AGRICULTURAL', 'INDUSTRIAL']).optional(),
+      season: z.enum(['SUMMER', 'WINTER', 'ALL_SEASON']).optional(),
+      minPrice: z.number().optional(),
+      maxPrice: z.number().optional(),
+      sortBy: z.enum(['price_asc', 'price_desc', 'name_asc', 'name_desc', 'featured']).default('featured'),
+    }))
+    .query(async ({ ctx, input }) => {
+      const { page, limit, search, brandId, categoryId, vehicleType, season, minPrice, maxPrice, sortBy, resellerTenantId } = input
+      const skip = (page - 1) * limit
+
+      // Get reseller to calculate final prices
+      const reseller = await ctx.prisma.tenant.findUnique({
+        where: { id: resellerTenantId, type: 'RESELLER', isActive: true }
+      })
+
+      if (!reseller) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Reseller not found'
+        })
+      }
+
+      const where: any = {
+        parentTenantId: reseller.parentId,
+        visible: true,
+        stockQty: { gt: 0 },
+      }
+
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { sku: { contains: search, mode: 'insensitive' } },
+          { brand: { name: { contains: search, mode: 'insensitive' } } }
+        ]
+      }
+
+      if (brandId) where.brandId = brandId
+      if (categoryId) where.categoryId = categoryId
+      if (vehicleType) where.vehicleType = vehicleType
+      if (season) where.season = season
+
+      // Price filtering (considering reseller margin)
+      if (minPrice || maxPrice) {
+        const priceFilter: any = {}
+        if (minPrice) priceFilter.gte = minPrice / (1 + reseller.margin)
+        if (maxPrice) priceFilter.lte = maxPrice / (1 + reseller.margin)
+        where.basePrice = priceFilter
+      }
+
+      // Sorting
+      let orderBy: any = { featured: 'desc' }
+      switch (sortBy) {
+        case 'price_asc':
+          orderBy = { basePrice: 'asc' }
+          break
+        case 'price_desc':
+          orderBy = { basePrice: 'desc' }
+          break
+        case 'name_asc':
+          orderBy = { name: 'asc' }
+          break
+        case 'name_desc':
+          orderBy = { name: 'desc' }
+          break
+      }
+
+      const [tires, total] = await Promise.all([
+        ctx.prisma.tire.findMany({
+          where,
+          include: {
+            brand: true,
+            category: true,
+          },
+          skip,
+          take: limit,
+          orderBy,
+        }),
+        ctx.prisma.tire.count({ where }),
+      ])
+
+      // Calculate final prices with reseller margin
+      const tiresWithFinalPrice = tires.map(tire => ({
+        ...tire,
+        finalPrice: Number(tire.basePrice) * (1 + Number(reseller.margin)),
+      }))
+
+      return {
+        tires: tiresWithFinalPrice,
+        total,
+        pages: Math.ceil(total / limit),
+        page,
+        limit,
+      }
+    }),
+
   // List tires for catalog (with tenant filtering)
   list: publicProcedure
     .input(z.object({

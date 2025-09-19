@@ -8,16 +8,33 @@ export function middleware(request: NextRequest) {
   // Extract subdomain
   const subdomain = hostname.split('.')[0]
 
-  // Main domain (tiredist.com)
-  if (hostname === 'tiredist.com' || hostname === 'localhost:3000') {
-    // Parent tenant - no rewrite needed
+  // Skip middleware for development
+  if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+    // For local development, check if subdomain exists
+    if (subdomain && subdomain !== 'localhost' && !subdomain.includes('127')) {
+      url.pathname = `/reseller/${subdomain}${url.pathname}`
+      return NextResponse.rewrite(url)
+    }
     return NextResponse.next()
   }
 
-  // Subdomain (rev1.tiredist.com or rev1.localhost:3000)
-  if (subdomain && subdomain !== 'www' && subdomain !== 'tiredist') {
-    // Child tenant - rewrite to tenant-specific pages
-    url.pathname = `/tenant/${subdomain}${url.pathname}`
+  // Main distributor domain
+  const mainDomain = process.env.MAIN_DOMAIN || 'tiredist.com'
+
+  // Main domain - distributor B2B site
+  if (hostname === mainDomain || hostname === `www.${mainDomain}`) {
+    return NextResponse.next()
+  }
+
+  // Subdomain - reseller B2C site (rev1.tiredist.com)
+  if (hostname.endsWith(`.${mainDomain}`) && subdomain !== 'www') {
+    url.pathname = `/reseller/${subdomain}${url.pathname}`
+    return NextResponse.rewrite(url)
+  }
+
+  // Custom domain - reseller with custom domain
+  if (!hostname.endsWith(mainDomain)) {
+    url.pathname = `/custom-domain/${hostname}${url.pathname}`
     return NextResponse.rewrite(url)
   }
 

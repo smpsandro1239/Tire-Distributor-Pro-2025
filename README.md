@@ -1,36 +1,40 @@
-# Tire Distributor Pro 2025 🚗
+# tire-distributor-pro-2025 🚗
 
-Uma plataforma abrangente de distribuição de pneus multi-tenant construída com Next.js 15, Supabase e tecnologias web modernas.
+> "From zero to tire empire in 1 deployment – multi-tenant B2B+B2C, AI-powered, global-scale"
+
+Uma plataforma completa de distribuição de pneus B2B com criação automática de sites B2C personalizados para revendedores.
 
 ## ✅ Estado Atual do Desenvolvimento
 
-### Concluído
+### 🎉 Recém Implementado
+- ✅ **Sistema Multi-Tenant Completo** - Middleware de roteamento por subdomínio
+- ✅ **Sites B2C Dinâmicos** - Páginas automáticas para revendedores
+- ✅ **Personalização Total** - Logo, cores, marca, SEO customizáveis
+- ✅ **Schema Expandido** - Promoções, reviews, loyalty, warehouses
+- ✅ **Reseller Router** - CRUD completo com analytics
+- ✅ **Tire Catalog B2C** - Catálogo público com preços dinâmicos
+- ✅ **Admin Dashboard** - Criação e gestão de revendedores
+- ✅ **Componentes UI** - Header, Footer, TireCard personalizáveis
+
+### Concluído Anteriormente
 - ✅ Estrutura base do monorepo (Turborepo + pnpm workspaces)
-- ✅ Schema Prisma completo com 15+ tabelas multi-tenant
-- ✅ Routers tRPC implementados:
-  - ✅ **Tire Router** - Gestão completa de pneus
-  - ✅ **Fleet Router** - Gestão de frotas
-  - ✅ **Sensor Router** - Monitorização IoT em tempo real
-  - ✅ **Retread Router** - Rastreamento de recapagens
-  - ✅ **Tenant Router** - Gestão multi-tenant
+- ✅ Schema Prisma completo com 20+ tabelas multi-tenant
+- ✅ Routers tRPC implementados (Tire, Fleet, Sensor, Retread, Tenant, Reseller)
 - ✅ Packages base criados (auth, stripe, ai, ui, kafka)
 - ✅ Configuração TypeScript e dependências
 
-### Em Desenvolvimento
-- 🔄 Correção de erros de tipos TypeScript
-- 🔄 Instalação completa de dependências
-- 🔄 Configuração do banco de dados
+### 🚧 Em Desenvolvimento
+- 🔄 Sistema de carrinho e checkout (Stripe)
+- 🔄 Dashboard de analytics para revendedores
+- 🔄 Sistema de reviews e avaliações
+- 🔄 Programa de fidelidade
 
-### Por Fazer
-- ⏳ Interface web (páginas Next.js)
-- ⏳ Middleware de autenticação
-- ⏳ Integração Stripe Connect
-- ⏳ Sistema de alertas em tempo real
-- ⏳ Dashboard de analytics
-- ⏳ Aplicação mobile
-- ⏳ Testes automatizados
-- ⏳ CI/CD pipeline
-- ⏳ Documentação completa
+### ⏳ Roadmap Próximo
+- ⏳ Integração Stripe Connect para payouts
+- ⏳ Sistema de notificações real-time
+- ⏳ Mobile app (React Native Expo)
+- ⏳ Testes automatizados (>95% coverage)
+- ⏳ CI/CD pipeline completo
 
 ## 🚀 Quick Start
 
