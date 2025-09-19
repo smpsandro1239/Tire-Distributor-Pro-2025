@@ -1,8 +1,8 @@
 'use client'
 
 import { MinusIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Button } from '@repo/ui/components/Button'
 import Image from 'next/image'
-import { Button } from '../../../packages/ui/src/components/Button'
 import { useCart } from '../contexts/CartContext'
 
 interface CartSidebarProps {
@@ -17,9 +17,31 @@ interface CartSidebarProps {
 export function CartSidebar({ reseller }: CartSidebarProps) {
   const { state, removeItem, updateQuantity, closeCart } = useCart()
 
-  const handleCheckout = () => {
-    // TODO: Implementar Stripe Checkout
-    console.log('Checkout with items:', state.items)
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: state.items,
+          resellerId: reseller.id,
+          customerEmail: '', // TODO: Get from user input or auth
+          successUrl: `${window.location.origin}/success`,
+          cancelUrl: window.location.href,
+        }),
+      })
+
+      const { url } = await response.json()
+
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      alert('Erro ao processar checkout. Tente novamente.')
+    }
   }
 
   if (!state.isOpen) return null
