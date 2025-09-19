@@ -4,6 +4,7 @@ import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 import { ShoppingCartIcon, StarIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useCart } from '../contexts/CartContext'
 
 interface TireCardProps {
   tire: {

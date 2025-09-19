@@ -1,7 +1,7 @@
 'use client';
 
+import { Button } from '@repo/ui';
 import { useEffect, useState } from 'react';
-import { Button } from '../../../../packages/ui/src/components/Button';
 import { TireCard } from '../../../components/TireCard';
 
 interface Tire {

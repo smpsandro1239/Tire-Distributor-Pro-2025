@@ -1,8 +1,7 @@
 'use client';
 
+import { Button, Modal } from '@repo/ui';
 import { useEffect, useState } from 'react';
-import { Button } from '../../../../packages/ui/src/components/Button';
-import { Modal } from '../../../../packages/ui/src/components/Modal';
 
 interface Tire {
   id: string;
