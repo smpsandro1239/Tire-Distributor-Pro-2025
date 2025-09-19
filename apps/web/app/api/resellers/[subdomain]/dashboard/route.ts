@@ -1,5 +1,5 @@
-import { db } from '@repo/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '../../../../../packages/db';
 
 export async function GET(
   request: NextRequest,

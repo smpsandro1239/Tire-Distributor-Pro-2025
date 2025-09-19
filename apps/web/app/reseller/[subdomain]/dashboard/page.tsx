@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@repo/ui/components/Button';
 import { useEffect, useState } from 'react';
+import { Button } from '../../../../packages/ui/src/components/Button';
 
 interface DashboardStats {
   totalOrders: number;

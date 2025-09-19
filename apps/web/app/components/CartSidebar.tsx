@@ -1,8 +1,8 @@
 'use client'
 
 import { MinusIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Button } from '@repo/ui/components/Button'
 import Image from 'next/image'
+import { Button } from '../../../packages/ui/src/components/Button'
 import { useCart } from '../contexts/CartContext'
 
 interface CartSidebarProps {
