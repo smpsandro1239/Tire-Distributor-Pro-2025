@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
               tire: true,
             },
           },
-          reseller: {
+          tenant: {
             select: {
               name: true,
               subdomain: true,
@@ -47,20 +47,20 @@ export async function GET(request: NextRequest) {
     const transformedOrders = orders.map(order => ({
       id: order.id,
       customerEmail: order.customerEmail,
-      resellerId: order.resellerId,
-      resellerName: order.reseller?.name || 'N/A',
-      totalAmount: order.totalAmount,
+      tenantId: order.tenantId,
+      tenantName: order.tenant?.name || 'N/A',
+      totalAmount: Number(order.total),
       status: order.status,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       items: order.items.map(item => ({
         id: item.id,
         tireId: item.tireId,
-        tireBrand: item.tire.brand,
-        tireModel: item.tire.model,
-        tireSize: item.tire.size,
+        tireBrand: item.tire.name,
+        tireModel: item.tire.name,
+        tireSize: `${item.tire.width}/${item.tire.aspectRatio}R${item.tire.rimDiameter}`,
         quantity: item.quantity,
-        price: item.price,
+        price: Number(item.unitPrice),
       })),
     }));
 
@@ -89,20 +89,25 @@ export async function POST(request: NextRequest) {
     const order = await db.order.create({
       data: {
         customerEmail: data.customerEmail,
-        resellerId: data.resellerId,
-        totalAmount: data.totalAmount,
-        status: 'pending',
-        stripeSessionId: data.stripeSessionId,
+        tenantId: data.tenantId,
+        total: data.totalAmount,
+        status: 'PENDING',
         items: {
           create: data.items.map((item: any) => ({
             tireId: item.tireId,
             quantity: item.quantity,
-            price: item.price,
+            unitPrice: item.price,
+            totalPrice: item.price * item.quantity,
           })),
         },
       },
       include: {
-        items: true,
+        items: {
+          include: {
+            tire: true,
+          },
+        },
+        tenant: true,
       },
     });
 

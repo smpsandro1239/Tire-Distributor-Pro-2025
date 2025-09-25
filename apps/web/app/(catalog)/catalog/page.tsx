@@ -1,14 +1,21 @@
 'use client'
 
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/app/lib/trpc'
 import { Button, Card, CardContent, CardHeader } from '@tire-distributor/ui'
 import { useState } from 'react'
 
 export default function CatalogPage() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<{
+    search: string;
+    brandId: string;
+    vehicleType: 'CAR' | 'TRUCK' | 'MOTORCYCLE' | 'BUS' | 'AGRICULTURAL' | 'INDUSTRIAL' | '';
+    minPrice: string;
+    maxPrice: string;
+    page: number;
+  }>({
     search: '',
     brandId: '',
-    vehicleType: '',
+    vehicleType: 'CAR',
     minPrice: '',
     maxPrice: '',
     page: 1,
@@ -18,9 +25,10 @@ export default function CatalogPage() {
     ...filters,
     minPrice: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+    vehicleType: filters.vehicleType || undefined,
   })
 
-  const { data: brands } = trpc.tire.getBrands?.useQuery() || { data: [] }
+  const { data: brands } = trpc.tire.list.useQuery({ page: 1, limit: 100 })
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -44,7 +52,7 @@ export default function CatalogPage() {
             <select
               className="px-3 py-2 border rounded-lg"
               value={filters.vehicleType}
-              onChange={(e) => setFilters({ ...filters, vehicleType: e.target.value })}
+              onChange={(e) => setFilters({ ...filters, vehicleType: e.target.value as 'CAR' | 'TRUCK' | 'MOTORCYCLE' | 'BUS' | 'AGRICULTURAL' | 'INDUSTRIAL' | '' })}
             >
               <option value="">Tipo de Veículo</option>
               <option value="CAR">Automóvel</option>

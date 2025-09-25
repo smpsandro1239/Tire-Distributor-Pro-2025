@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     if (reseller) {
       // Filter by reseller's available tires
-      where.resellerId = reseller;
+      where.tenantId = reseller;
     }
 
     if (brand) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Only show tires with stock
-    where.stock = { gt: 0 };
+    where.stockQty = { gt: 0 };
 
     const [tires, total] = await Promise.all([
       db.tire.findMany({

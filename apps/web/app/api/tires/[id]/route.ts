@@ -37,15 +37,12 @@ export async function PUT(
     const tire = await db.tire.update({
       where: { id: params.id },
       data: {
-        brand: data.brand,
-        model: data.model,
-        size: data.size,
-        price: parseFloat(data.price),
-        stock: parseInt(data.stock),
-        category: data.category,
+        name: data.name,
+        sku: data.sku,
         description: data.description,
-        image: data.image,
-        specifications: data.specifications || {},
+        basePrice: parseFloat(data.basePrice),
+        stockQty: parseInt(data.stockQty),
+        images: data.images || [],
       },
     });
 

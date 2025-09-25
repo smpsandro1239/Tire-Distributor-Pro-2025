@@ -1,4 +1,4 @@
-import { db } from '@tire-distributor/db'
+import { prisma } from '@tire-distributor/db'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
@@ -8,7 +8,7 @@ interface ResellerLayoutProps {
 }
 
 export async function generateMetadata({ params }: ResellerLayoutProps): Promise<Metadata> {
-  const reseller = await db.tenant.findUnique({
+  const reseller = await prisma.tenant.findUnique({
     where: {
       subdomain: params.subdomain,
       type: 'RESELLER',
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: ResellerLayoutProps): Promise
 }
 
 export default async function ResellerLayout({ children, params }: ResellerLayoutProps) {
-  const reseller = await db.tenant.findUnique({
+  const reseller = await prisma.tenant.findUnique({
     where: {
       subdomain: params.subdomain,
       type: 'RESELLER',

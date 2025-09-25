@@ -14,7 +14,7 @@ export async function GET(
             tire: true,
           },
         },
-        reseller: {
+        tenant: {
           select: {
             name: true,
             subdomain: true,

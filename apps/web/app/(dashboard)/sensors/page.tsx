@@ -1,16 +1,19 @@
 'use client'
 
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/app/lib/trpc'
 import { Button, Card, CardContent, CardHeader } from '@tire-distributor/ui'
 import { useState } from 'react'
 
 export default function SensorsPage() {
   const [filters, setFilters] = useState({
     isActive: undefined as boolean | undefined,
-    position: '',
+    position: 'FRONT_LEFT' as const,
   })
 
-  const { data: sensors, isLoading } = trpc.sensor.list.useQuery(filters)
+  const { data: sensors, isLoading } = trpc.sensor.list.useQuery({
+    ...filters,
+    position: filters.position || undefined,
+  })
   const { data: alerts } = trpc.sensor.getAlerts.useQuery({})
   const { data: analytics } = trpc.sensor.getAnalytics.useQuery({})
 

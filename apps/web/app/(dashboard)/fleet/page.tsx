@@ -1,6 +1,6 @@
 'use client'
 
-import { trpc } from '@/lib/trpc'
+import { trpc } from '@/app/lib/trpc'
 import { Button, Card, CardContent, CardHeader, Modal } from '@tire-distributor/ui'
 import { useState } from 'react'
 

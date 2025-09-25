@@ -5,8 +5,9 @@ export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   const url = request.nextUrl.clone()
 
-  // Extract subdomain
-  const subdomain = hostname.split('.')[0]
+  // Extract subdomain (remove port if present)
+  const hostnameWithoutPort = hostname.split(':')[0]
+  const subdomain = hostnameWithoutPort.split('.')[0]
 
   // Skip middleware for development
   if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {

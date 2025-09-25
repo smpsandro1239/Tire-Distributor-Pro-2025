@@ -37,7 +37,11 @@ export async function GET(
       include: {
         items: {
           include: {
-            tire: true,
+            tire: {
+              include: {
+                brand: true,
+              },
+            },
           },
         },
       },

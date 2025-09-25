@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'tiredist.com'],
   },
+  transpilePackages: ['@tire-distributor/ui'],
   async rewrites() {
     return [
       {

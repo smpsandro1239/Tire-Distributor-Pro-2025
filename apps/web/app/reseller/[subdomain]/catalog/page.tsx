@@ -178,7 +178,20 @@ export default function CatalogPage({ params }: CatalogPageProps) {
       {tires.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tires.map((tire) => (
-            <TireCard key={tire.id} tire={tire} />
+            <TireCard
+              key={tire.id}
+              tire={{
+                ...tire,
+                brand: { name: tire.brand.name, logo: tire.brand.logo ?? null },
+                category: { name: tire.category.name },
+              }}
+              reseller={{
+                id: 'default',
+                name: 'Default Reseller',
+                primaryColor: '#3B82F6',
+                margin: 0.18,
+              }}
+            />
           ))}
         </div>
       ) : (
