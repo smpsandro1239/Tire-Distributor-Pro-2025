@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@repo/ui';
+import { Button } from '@tire-distributor/ui';
 import { useEffect, useRef, useState } from 'react';
 
 interface Message {

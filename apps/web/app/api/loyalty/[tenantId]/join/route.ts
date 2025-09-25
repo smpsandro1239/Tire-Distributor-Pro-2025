@@ -1,4 +1,4 @@
-import { db } from '@repo/db';
+import { prisma as db } from '@tire-distributor/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(

@@ -1,19 +1,9 @@
 'use client';
 
-import { Button } from '@repo/ui';
+import { Tire } from '@tire-distributor/db';
+import { Button } from '@tire-distributor/ui';
 import { useEffect, useState } from 'react';
 import { TireCard } from '../../../components/TireCard';
-
-interface Tire {
-  id: string;
-  brand: string;
-  model: string;
-  size: string;
-  price: number;
-  stock: number;
-  image?: string;
-  category: string;
-}
 
 interface CatalogPageProps {
   params: { subdomain: string };

@@ -1,7 +1,7 @@
 'use client'
 
 import { MinusIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Button } from '@repo/ui'
+import { Button } from '@tire-distributor/ui'
 import Image from 'next/image'
 import { useCart } from '../contexts/CartContext'
 

@@ -1,6 +1,6 @@
+import { db } from '@tire-distributor/db'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { db } from '../../../../packages/db'
 
 interface ResellerLayoutProps {
   children: React.ReactNode

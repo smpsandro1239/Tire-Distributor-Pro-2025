@@ -1,4 +1,4 @@
-import { db } from '@repo/db';
+import { prisma as db } from '@tire-distributor/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -48,6 +48,10 @@ export async function GET(request: NextRequest) {
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: {
+          brand: true,
+          category: true,
+        },
       }),
       db.tire.count({ where }),
     ]);
@@ -76,15 +80,19 @@ export async function POST(request: NextRequest) {
 
     const tire = await db.tire.create({
       data: {
-        brand: data.brand,
-        model: data.model,
-        size: data.size,
-        price: parseFloat(data.price),
-        stock: parseInt(data.stock),
-        category: data.category,
+        name: data.name,
+        sku: data.sku,
         description: data.description,
-        image: data.image,
-        specifications: data.specifications || {},
+        parentTenantId: data.parentTenantId,
+        tenantId: data.tenantId,
+        brandId: data.brandId,
+        categoryId: data.categoryId,
+        width: data.width,
+        aspectRatio: data.aspectRatio,
+        rimDiameter: data.rimDiameter,
+        basePrice: parseFloat(data.basePrice),
+        stockQty: parseInt(data.stockQty),
+        images: data.images || [],
       },
     });
 

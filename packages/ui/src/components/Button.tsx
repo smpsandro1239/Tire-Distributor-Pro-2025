@@ -8,6 +8,7 @@ interface ButtonProps {
   disabled?: boolean
   className?: string
   type?: 'button' | 'submit' | 'reset'
+  style?: React.CSSProperties
 }
 
 export function Button({
@@ -17,7 +18,8 @@ export function Button({
   onClick,
   disabled,
   className = '',
-  type = 'button'
+  type = 'button',
+  style
 }: ButtonProps) {
   const baseClasses = 'font-medium rounded-lg transition-colors focus:outline-none focus:ring-2'
 
@@ -42,6 +44,7 @@ export function Button({
       } ${className}`}
       onClick={onClick}
       disabled={disabled}
+      style={style}
     >
       {children}
     </button>
