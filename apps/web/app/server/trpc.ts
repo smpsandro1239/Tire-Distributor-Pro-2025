@@ -22,7 +22,11 @@ export const publicProcedure = t.procedure
 
 // Middleware for tenant isolation
 const tenantMiddleware = t.middleware(({ ctx, next }) => {
-  if (!ctx.tenantId) {
+  // Allow development without tenant for localhost
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const isLocalhost = ctx.req.headers.host?.includes('localhost') || ctx.req.headers.host?.includes('127.0.0.1')
+
+  if (!ctx.tenantId && !isDevelopment && !isLocalhost) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'Tenant not found',

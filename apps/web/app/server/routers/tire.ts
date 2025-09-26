@@ -113,8 +113,8 @@ export const tireRouter = router({
     .input(z.object({
       tenantId: z.string().uuid().optional(),
       search: z.string().optional(),
-      brandId: z.string().uuid().optional(),
-      categoryId: z.string().uuid().optional(),
+      brandId: z.string().uuid().optional().or(z.literal('')),
+      categoryId: z.string().uuid().optional().or(z.literal('')),
       vehicleType: z.enum(['CAR', 'TRUCK', 'MOTORCYCLE', 'BUS', 'AGRICULTURAL', 'INDUSTRIAL']).optional(),
       minPrice: z.number().optional(),
       maxPrice: z.number().optional(),
@@ -148,8 +148,8 @@ export const tireRouter = router({
       }
 
       // Filters
-      if (brandId) where.brandId = brandId
-      if (categoryId) where.categoryId = categoryId
+      if (brandId && brandId !== '') where.brandId = brandId
+      if (categoryId && categoryId !== '') where.categoryId = categoryId
       if (vehicleType) where.vehicleType = vehicleType
       if (minPrice || maxPrice) {
         where.basePrice = {}
